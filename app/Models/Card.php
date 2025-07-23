@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Card extends Model
 {
     use SoftDeletes;
+
+    protected $fillable = [
+        'name', 'color', 'attributes', 'image_path', 'category_id',
+    ];
 }
