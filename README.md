@@ -65,3 +65,5 @@ ejecuta migraciones y
 
 
 php artisan db:seed --class=UserSeeder
+
+php artisan storage:link

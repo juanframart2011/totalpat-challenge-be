@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('action', 50);
-            $table->string('module', 50);
+            $table->string('method', 10);
+            $table->string('path', 255);
+            $table->string('action', 100)->nullable();
             $table->ipAddress('ip')->nullable();
             $table->timestamps();
             $table->softDeletes();

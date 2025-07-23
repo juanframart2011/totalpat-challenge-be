@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Session\Middleware\StartSession;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Configuration\Schedule; 
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,8 +19,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             StartSession::class,                         // 👈 habilita la sesión
             EnsureFrontendRequestsAreStateful::class,    // ya lo tenías
-        ]);
+            \App\Http\Middleware\ActivityLogger::class,
 
+
+        ])
+        ->withSchedule(function (Schedule $schedule): void {
+            // ⬇️  Tarea: purgar sesiones cada minuto
+            $schedule->command('session:prune')->everyMinute();
+        })
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);

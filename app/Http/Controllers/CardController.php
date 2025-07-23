@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Card;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCardRequest;
+use App\Http\Requests\UpdateCardRequest;
+use Illuminate\Support\Facades\Storage;
 
 class CardController extends Controller
 {
@@ -11,48 +15,59 @@ class CardController extends Controller
      */
     public function index()
     {
-        return Card::with('category')
+        return Card::with('category')            // 👈 eager-load categoría
+               ->where('user_id', $request->user()->id)
                ->latest()
                ->paginate(3);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    /** Crear */
     public function store(StoreCardRequest $request)
     {
-        $path = $request->file('image')
-            ? $request->file('image')->store('public/cards')
-            : null;
+        $data = $request->validated();
 
-        $card = $request->user()->cards()->create(
-            $request->validated() + ['image_path' => $path]
-        );
+        if ($request->file('image')) {
+            $data['image_path'] = $request->file('image')
+                                          ->store('public/cards');
+        }
+
+        $card = $request->user()->cards()->create($data);
 
         return response()->json($card, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    /** Mostrar uno */
+    public function show(Card $card)
     {
-        //
+        $this->authorize('view', $card);     // opcional: policy
+        return $card;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    /** Actualizar */
+    public function update(UpdateCardRequest $request, Card $card)
     {
-        //
+        $this->authorize('update', $card);
+
+        $data = $request->validated();
+
+        if ($request->file('image')) {
+            // borra la anterior si existía
+            if ($card->image_path) {
+                Storage::delete($card->image_path);
+            }
+            $data['image_path'] = $request->file('image')
+                                          ->store('public/cards');
+        }
+
+        $card->update($data);
+        return $card;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    /** Borrado lógico */
+    public function destroy(Card $card)
     {
-        //
+        $this->authorize('delete', $card);
+        $card->delete();
+        return response()->noContent();
     }
 }

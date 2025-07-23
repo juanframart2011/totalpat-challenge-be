@@ -3,8 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Models\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ActivityLogger
 {
@@ -13,19 +14,23 @@ class ActivityLogger
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
+        // Procesa la solicitud primero
         $response = $next($request);
 
+        // Crea el registro en un try-catch para no romper el flujo
         try {
-            LogModel::create([
+            Log::create([
                 'user_id' => optional($request->user())->id,
-                'action'  => $request->method(),
-                'module'  => $request->route()->getName() ?? '',
+                'method'  => $request->method(),
+                'path'    => $request->path(),
+                'action'  => Route::currentRouteName()      // cards.store, etc.
+                               ?? Route::currentRouteAction(), // App\Http\Controllers…
                 'ip'      => $request->ip(),
             ]);
         } catch (\Throwable $e) {
-            report($e); // nunca interrumpe la petición
+            report($e); // registra en logs de Laravel pero no detiene la respuesta
         }
 
         return $response;
