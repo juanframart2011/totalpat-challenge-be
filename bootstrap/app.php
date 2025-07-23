@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             StartSession::class,                         // 👈 habilita la sesión
             EnsureFrontendRequestsAreStateful::class,    // ya lo tenías
+            \App\Http\Middleware\ActivityLogger::class,
         ]);
 
         $middleware->alias([
