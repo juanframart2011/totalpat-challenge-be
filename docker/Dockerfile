@@ -29,4 +29,6 @@ CMD bash -c "\
   composer install --no-interaction --prefer-dist --no-progress && \
   php artisan key:generate --force && \
   php artisan migrate --force || true && \
+  # ───────── Scheduler en segundo plano ─────────
+  php artisan schedule:work --verbose --no-interaction & \
   php artisan serve --host=0.0.0.0 --port=8000"
