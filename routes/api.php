@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('cards', \App\Http\Controllers\CardController::class)
-          ->only(['index', 'store']);
+    
+    Route::apiResource('cards', \App\Http\Controllers\CardController::class);
 });
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
