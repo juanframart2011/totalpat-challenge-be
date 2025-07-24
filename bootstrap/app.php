@@ -20,16 +20,17 @@ return Application::configure(basePath: dirname(__DIR__))
             StartSession::class,                         // 👈 habilita la sesión
             EnsureFrontendRequestsAreStateful::class,    // ya lo tenías
             \App\Http\Middleware\ActivityLogger::class,
+        ]);
 
-
-        ])
-        ->withSchedule(function (Schedule $schedule): void {
-            // ⬇️  Tarea: purgar sesiones cada minuto
-            $schedule->command('session:prune')->everyMinute();
-        })
+        // Alias personalizados
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'auth.front' => \App\Http\Middleware\EnsureApiToken::class,
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        // ⬇️  Tarea: purgar sesiones cada minuto
+        $schedule->command('session:prune')->everyMinute();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
