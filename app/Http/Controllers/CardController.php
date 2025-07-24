@@ -27,8 +27,9 @@ class CardController extends Controller
         $data = $request->validated();
 
         if ($request->file('image')) {
+            // guarda en storage/app/public/cards/…
             $data['image_path'] = $request->file('image')
-                                          ->store('public/cards');
+                                          ->store('cards', 'public');
         }
 
         $card = $request->user()->cards()->create($data);
