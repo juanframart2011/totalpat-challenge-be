@@ -13,7 +13,7 @@ class CardController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index( Request $request )
     {
         return Card::with('category')            // 👈 eager-load categoría
                ->where('user_id', $request->user()->id)
